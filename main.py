@@ -69,15 +69,28 @@ def ship_spawning():
             ship_bot_speed += random.randint(2,4)
             ship_bot_spawned = True
 
+#shooting mechanics
 def shooting(direction):
+    global ship_left_rect, ship_top_rect, ship_right_rect, ship_bot_rect
+    global ship_left_speed, ship_top_speed, ship_right_speed, ship_bot_speed
+    global ship_left_spawned, ship_top_spawned, ship_right_spawned, ship_bot_spawned
+
     if direction == 0:
-        print('boom left')
+        ship_left_rect = ship_left_surface.get_rect(center = (-16,340))
+        ship_left_speed = 0
+        ship_left_spawned = False
     if direction == 1:
-        print('boom top')
+        ship_top_rect = ship_top_surface.get_rect(center = (340,-16))
+        ship_top_speed = 0
+        ship_top_spawned = False
     if direction == 2:
-        print('boom right')
+        ship_right_rect = ship_right_surface.get_rect(center = (696,340))
+        ship_right_speed = 0
+        ship_right_spawned = False
     if direction == 3:
-        print('boom bottom')
+        ship_bot_rect = ship_bot_surface.get_rect(center = (340,696))
+        ship_bot_speed = 0
+        ship_bot_spawned = False
 
 #checks if the game just started
 gamestarted_check = True
@@ -87,8 +100,7 @@ while True:
 
     #detects if the music is on beat
     frame_counter += 1
-    print(frame_counter)
-    if frame_counter % 60 == 0:
+    if frame_counter % 30 == 0:
         onbeat = True
     
     #handling input
@@ -98,7 +110,7 @@ while True:
             exit()
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT: 
-                shooting(0)
+                 shooting(0)
             if event.key == pygame.K_UP: 
                 shooting(1)
             if event.key == pygame.K_RIGHT: 
@@ -109,7 +121,7 @@ while True:
 
     #music
     if gamestarted_check == True:
-        pygame.mixer.music.load('music/music_loop.mp3')
+        pygame.mixer.music.load('music/music_menu.mp3')
         pygame.mixer.music.play(-1)
         gamestarted_check = False
 
@@ -118,7 +130,6 @@ while True:
         ship_spawning()
         frame_counter = 0
 
-    pygame.mixer.music.get_pos()
     screen.blit(sea_surface,(0,0))
     screen.blit(fort_surface,fort_rect)
 
@@ -132,7 +143,7 @@ while True:
     ship_right_rect.x -= ship_right_speed
     ship_bot_rect.y -= ship_bot_speed
 
-    #if ship_rect.colliderect(bullet_rect):
+    #if ship_rect.colliderect(fort_rect):
     #    print('collision')
 
     onbeat = False
