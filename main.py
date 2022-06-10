@@ -13,6 +13,15 @@ font = pygame.font.Font('font/Pixeltype.ttf', 40)
 #ASSETS
 sea_surface = pygame.image.load('assets/sea_bg.png').convert()
 
+#menu assets
+menu_bg = pygame.image.load('assets/menu_bg.png').convert()
+bt_start = pygame.image.load('assets/bt_start.png').convert()
+bt_quit = pygame.image.load('assets/bt_quit.png').convert()
+
+#menu buttons rects
+bt_start_rect = bt_start.get_rect(midleft = (100,200))
+bt_quit_rect = bt_quit.get_rect(midleft = (380,200))
+
 #fort
 fort_surface = pygame.image.load('assets/fort.png').convert_alpha()
 fort_rect = fort_surface.get_rect(center = (340,340))
@@ -52,6 +61,10 @@ ship_bot_spawned = False
 bullet_count = 1
 ships_destroyed = 0
 
+#synchronisation variables
+gamestarted_check = True
+onbeat = False
+
 #spawns random ships
 def ship_spawning():
     global ship_left_speed, ship_top_speed, ship_right_speed, ship_bot_speed
@@ -60,19 +73,19 @@ def ship_spawning():
     ship_sp = random.randint(0,3)
     if ship_sp == 0:
         if ship_left_spawned == False:
-            ship_left_speed += random.randint(2,4)
+            ship_left_speed += random.randint(3,5)
             ship_left_spawned = True
     if ship_sp == 1:
         if ship_top_spawned == False:
-            ship_top_speed += random.randint(2,4)
+            ship_top_speed += random.randint(3,5)
             ship_top_spawned = True
     if ship_sp == 2:
         if ship_right_spawned == False:
-            ship_right_speed += random.randint(2,4)
+            ship_right_speed += random.randint(3,5)
             ship_right_spawned = True
     if ship_sp == 3:
         if ship_bot_spawned == False:
-            ship_bot_speed += random.randint(2,4)
+            ship_bot_speed += random.randint(3,5)
             ship_bot_spawned = True
 
 #shooting mechanics
@@ -107,77 +120,94 @@ def shooting(direction):
             snd_explode.play()
             ship_bot_spawned = False
 
-#synchronisation variables
-gamestarted_check = True
-onbeat = False
+#main menu
+def main_menu():
+    while True:
+        screen.blit(menu_bg, (0,0))
+        screen.blit(bt_start,bt_start_rect)
+        screen.blit(bt_quit,bt_quit_rect)
 
-#main gameloop
-while True:
+        #inputs
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
 
-    #detects if the music is on beat
-    frame_counter += 1
-    if frame_counter % 30 == 0:
-        onbeat = True
+        
+        pygame.display.update()
+        clock.tick(60)
+
+#gameloop
+def game():
+    while True:
+
+        #detects if the music is on beat
+        frame_counter += 1
+        if frame_counter % 30 == 0:
+            onbeat = True
+
+        #handling input
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+            if event.type == pygame.KEYDOWN:
+                if bullet_count >= 1:
+                    if event.key == pygame.K_LEFT: 
+                         shooting(0)
+                    if event.key == pygame.K_UP: 
+                        shooting(1)
+                    if event.key == pygame.K_RIGHT: 
+                        shooting(2)
+                    if event.key == pygame.K_DOWN: 
+                        shooting(3)
+
+
+        #music
+        if gamestarted_check == True:
+            pygame.mixer.music.play(-1)
+            gamestarted_check = False
+
+        #spawns ships and adds a bullet on beat
     
-    #handling input
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            exit()
-        if event.type == pygame.KEYDOWN:
-            if bullet_count >= 1:
-                if event.key == pygame.K_LEFT: 
-                     shooting(0)
-                if event.key == pygame.K_UP: 
-                    shooting(1)
-                if event.key == pygame.K_RIGHT: 
-                    shooting(2)
-                if event.key == pygame.K_DOWN: 
-                    shooting(3)
+        if onbeat == True:
+            if bullet_count < 1:
+                bullet_count = 1 
+            ship_spawning()
+            frame_counter = 0
 
+        #background drawing
+        screen.blit(sea_surface,(0,0))
+        screen.blit(fort_surface,fort_rect)
 
-    #music
-    if gamestarted_check == True:
-        pygame.mixer.music.play(-1)
-        gamestarted_check = False
+        #ships drawing
+        screen.blit(ship_left_surface,ship_left_rect)
+        screen.blit(ship_top_surface,ship_top_rect)
+        screen.blit(ship_right_surface,ship_right_rect)
+        screen.blit(ship_bot_surface,ship_bot_rect)
 
-    #spawns ships and adds a bullet on beat
+        #ship movement
+        ship_left_rect.x += ship_left_speed
+        ship_top_rect.y += ship_top_speed
+        ship_right_rect.x -= ship_right_speed
+        ship_bot_rect.y -= ship_bot_speed
+
+        #text surfaces for bullets and stats
+        if bullet_count == 1:
+            bullet_txt_surface = font.render('Ready to fire!', False, 'White')
+        else:
+            bullet_txt_surface = font.render('No more ammo', False, 'White')
+        
+        ships_txt_surface = font.render('Ships destroyed: ' + str(ships_destroyed), False, 'White')
+        screen.blit(bullet_txt_surface, (20,20))
+        screen.blit(ships_txt_surface, (20,60))
+
+        #if ship_rect.colliderect(fort_rect):
+        #    print('collision')
+        print(bullet_count)
+        onbeat = False
+        #update
+        pygame.display.update()
+        clock.tick(60)
     
-    if onbeat == True:
-        if bullet_count < 1:
-            bullet_count = 1 
-        ship_spawning()
-        frame_counter = 0
-
-    #background drawing
-    screen.blit(sea_surface,(0,0))
-    screen.blit(fort_surface,fort_rect)
-
-    #ships drawing
-    screen.blit(ship_left_surface,ship_left_rect)
-    screen.blit(ship_top_surface,ship_top_rect)
-    screen.blit(ship_right_surface,ship_right_rect)
-    screen.blit(ship_bot_surface,ship_bot_rect)
-    
-    #ship movement
-    ship_left_rect.x += ship_left_speed
-    ship_top_rect.y += ship_top_speed
-    ship_right_rect.x -= ship_right_speed
-    ship_bot_rect.y -= ship_bot_speed
-
-    #text surfaces for bullets and stats
-    if bullet_count == 1:
-        bullet_txt_surface = font.render('Ready to fire!', False, 'White')
-    else:
-        bullet_txt_surface = font.render('No more ammo', False, 'White')
-    ships_txt_surface = font.render('Ships destroyed: ' + str(ships_destroyed), False, 'White')
-    screen.blit(bullet_txt_surface, (20,20))
-    screen.blit(ships_txt_surface, (20,60))
-    #if ship_rect.colliderect(fort_rect):
-    #    print('collision')
-    print(bullet_count)
-    onbeat = False
-    #update
-    pygame.display.update()
-    clock.tick(60)
-    
+main_menu()

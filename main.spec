@@ -6,7 +6,7 @@ block_cipher = None
 
 a = Analysis(
     ['main.py'],
-    pathex=[],
+    pathex=['.\\*'],
     binaries=[],
     datas=[],
     hiddenimports=[],
@@ -35,7 +35,7 @@ exe = EXE(
     upx=True,
     upx_exclude=[],
     runtime_tmpdir=None,
-    console=True,
+    console=False,
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,
