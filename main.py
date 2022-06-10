@@ -25,15 +25,13 @@ ship_right_surface = pygame.image.load('assets/ship_right.png').convert_alpha()
 ship_bot_surface = pygame.image.load('assets/ship_bot.png').convert_alpha()
 
 #ship rects
-ship_left_rect = ship_left_surface.get_rect(center = (0,340))
-ship_top_rect = ship_top_surface.get_rect(center = (340,0))
-ship_right_rect = ship_right_surface.get_rect(center = (680,340))
-ship_bot_rect = ship_bot_surface.get_rect(center = (340,680))
+ship_left_rect = ship_left_surface.get_rect(center = (-16,340))
+ship_top_rect = ship_top_surface.get_rect(center = (340,-16))
+ship_right_rect = ship_right_surface.get_rect(center = (696,340))
+ship_bot_rect = ship_bot_surface.get_rect(center = (340,696))
 
-#ship speeds global
-
-
-frame_counter = 1
+#synchronisation frames for spawning ships
+frame_counter = 0
 #handles player shooting
 #def player_shooting():
     #fdadngadg
@@ -42,6 +40,7 @@ ship_left_speed = 0
 ship_top_speed = 0
 ship_right_speed = 0
 ship_bot_speed = 0
+
 ship_left_spawned = False
 ship_top_spawned = False
 ship_right_spawned = False
@@ -55,35 +54,58 @@ def ship_spawning():
     ship_sp = random.randint(0,3)
     if ship_sp == 0:
         if ship_left_spawned == False:
-            ship_left_speed += random.randint(1,3)
+            ship_left_speed += random.randint(2,4)
             ship_left_spawned = True
     if ship_sp == 1:
         if ship_top_spawned == False:
-            ship_top_speed += random.randint(1,3)
+            ship_top_speed += random.randint(2,4)
             ship_top_spawned = True
     if ship_sp == 2:
         if ship_right_spawned == False:
-            ship_right_speed += random.randint(1,3)
+            ship_right_speed += random.randint(2,4)
             ship_right_spawned = True
     if ship_sp == 3:
         if ship_bot_spawned == False:
-            ship_bot_speed += random.randint(1,3)
+            ship_bot_speed += random.randint(2,4)
             ship_bot_spawned = True
 
+def shooting(direction):
+    if direction == 0:
+        print('boom left')
+    if direction == 1:
+        print('boom top')
+    if direction == 2:
+        print('boom right')
+    if direction == 3:
+        print('boom bottom')
 
 #checks if the game just started
 gamestarted_check = True
-
+onbeat = False
 #main gameloop
 while True:
+
+    #detects if the music is on beat
     frame_counter += 1
     print(frame_counter)
-
+    if frame_counter % 60 == 0:
+        onbeat = True
+    
     #handling input
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
             exit()
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_LEFT: 
+                shooting(0)
+            if event.key == pygame.K_UP: 
+                shooting(1)
+            if event.key == pygame.K_RIGHT: 
+                shooting(2)
+            if event.key == pygame.K_DOWN: 
+                shooting(3)
+
 
     #music
     if gamestarted_check == True:
@@ -91,8 +113,10 @@ while True:
         pygame.mixer.music.play(-1)
         gamestarted_check = False
 
-    #ship movement
-    ship_spawning()
+    #spawns ships on beat
+    if onbeat == True: 
+        ship_spawning()
+        frame_counter = 0
 
     pygame.mixer.music.get_pos()
     screen.blit(sea_surface,(0,0))
@@ -111,6 +135,7 @@ while True:
     #if ship_rect.colliderect(bullet_rect):
     #    print('collision')
 
+    onbeat = False
     #update
     pygame.display.update()
     clock.tick(60)
