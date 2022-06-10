@@ -18,13 +18,8 @@ menu_bg = pygame.image.load('assets/menu_bg.png').convert()
 bt_start = pygame.image.load('assets/bt_start.png').convert()
 bt_quit = pygame.image.load('assets/bt_quit.png').convert()
 
-#menu buttons rects
-bt_start_rect = bt_start.get_rect(midleft = (100,200))
-bt_quit_rect = bt_quit.get_rect(midleft = (380,200))
-
-#fort
+#fort asset
 fort_surface = pygame.image.load('assets/fort.png').convert_alpha()
-fort_rect = fort_surface.get_rect(center = (340,340))
 
 #ship assets
 ship_left_surface = pygame.image.load('assets/ship_left.png').convert_alpha()
@@ -33,16 +28,13 @@ ship_right_surface = pygame.image.load('assets/ship_right.png').convert_alpha()
 ship_bot_surface = pygame.image.load('assets/ship_bot.png').convert_alpha()
 
 #ship rects
-ship_left_rect = ship_left_surface.get_rect(center = (-32,340))
-ship_top_rect = ship_top_surface.get_rect(center = (340,-32))
-ship_right_rect = ship_right_surface.get_rect(center = (712,340))
-ship_bot_rect = ship_bot_surface.get_rect(center = (340,712))
+
 
 
 #sfx
 snd_explode = pygame.mixer.Sound('sfx/explosion.mp3')
 snd_death = pygame.mixer.Sound('sfx/death.mp3')
-music_loop = pygame.mixer.music.load('music/music_loop.mp3')
+
 
 #synchronisation data for spawning ships
 frame_counter = 0
@@ -61,6 +53,8 @@ ship_bot_spawned = False
 bullet_count = 1
 ships_destroyed = 0
 
+#menu click
+click = False
 #synchronisation variables
 gamestarted_check = True
 onbeat = False
@@ -120,25 +114,85 @@ def shooting(direction):
             snd_explode.play()
             ship_bot_spawned = False
 
+#collision mechanics
+def collision():
+    if ((ship_left_rect.colliderect(fort_rect) or ship_top_rect.colliderect(fort_rect)) or (ship_right_rect.colliderect(fort_rect) or ship_bot_rect.colliderect(fort_rect))):
+        loss_screen()
+
+#lose screen
+def loss_screen():
+    print('you lose')
+    main_menu()
+
 #main menu
 def main_menu():
+    global click
+    pygame.mixer.music.stop()
+
+    #menu buttons rects
+    bt_start_rect = bt_start.get_rect(midleft = (100,400))
+    bt_quit_rect = bt_quit.get_rect(midleft = (380,400))
+
+    menu_loop = pygame.mixer.music.load('music/music_menu.mp3')
+    pygame.mixer.music.play(-1)
+
     while True:
         screen.blit(menu_bg, (0,0))
         screen.blit(bt_start,bt_start_rect)
         screen.blit(bt_quit,bt_quit_rect)
 
+        mx, my = pygame.mouse.get_pos()
+
+        if bt_start_rect.collidepoint((mx, my)):
+            if click:
+                click = False
+                game()
+        if bt_quit_rect.collidepoint((mx, my)):
+                if click:
+                    click = False
+                    pygame.quit()
+                    exit()
+
         #inputs
+        click = False
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit()
-
-        
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    click = True
         pygame.display.update()
         clock.tick(60)
 
 #gameloop
 def game():
+    #ship variables
+    global ship_left_speed, ship_top_speed, ship_right_speed, ship_bot_speed, ship_left_spawned, ship_top_spawned, ship_right_spawned, ship_bot_spawned, ship_left_rect, ship_top_rect, ship_right_rect, ship_bot_rect
+    global fort_rect
+    #sync variables
+    global frame_counter, bullet_count, ships_destroyed, gamestarted_check, onbeat
+
+    fort_rect = fort_surface.get_rect(center = (340,340))
+    ship_left_rect = ship_left_surface.get_rect(center = (-32,340))
+    ship_top_rect = ship_top_surface.get_rect(center = (340,-32))
+    ship_right_rect = ship_right_surface.get_rect(center = (712,340))
+    ship_bot_rect = ship_bot_surface.get_rect(center = (340,712))
+
+    pygame.mixer.music.stop()
+    music_loop = pygame.mixer.music.load('music/music_loop.mp3')
+    pygame.mixer.music.play(-1)
+
+    #position and speed reset back to default
+    ship_left_spawned = False
+    ship_top_spawned = False
+    ship_right_spawned = False
+    ship_bot_spawned = False
+    ship_left_speed = 0
+    ship_top_speed = 0
+    ship_right_speed = 0
+    ship_bot_speed = 0
+
     while True:
 
         #detects if the music is on beat
@@ -161,12 +215,8 @@ def game():
                         shooting(2)
                     if event.key == pygame.K_DOWN: 
                         shooting(3)
-
-
-        #music
-        if gamestarted_check == True:
-            pygame.mixer.music.play(-1)
-            gamestarted_check = False
+                if event.key == pygame.K_ESCAPE:
+                    main_menu()
 
         #spawns ships and adds a bullet on beat
     
@@ -192,6 +242,8 @@ def game():
         ship_right_rect.x -= ship_right_speed
         ship_bot_rect.y -= ship_bot_speed
 
+        collision()
+
         #text surfaces for bullets and stats
         if bullet_count == 1:
             bullet_txt_surface = font.render('Ready to fire!', False, 'White')
@@ -202,8 +254,6 @@ def game():
         screen.blit(bullet_txt_surface, (20,20))
         screen.blit(ships_txt_surface, (20,60))
 
-        #if ship_rect.colliderect(fort_rect):
-        #    print('collision')
         print(bullet_count)
         onbeat = False
         #update
