@@ -6,17 +6,14 @@ pygame.init()
 clock = pygame.time.Clock()
 screen = pygame.display.set_mode((680,680))
 pygame.display.set_caption('Shanty Shootah')
-test_font = pygame.font.Font('font/Pixeltype.ttf', 50)
+font = pygame.font.Font('font/Pixeltype.ttf', 50)
 
-sky_surface = pygame.image.load('graphics/Sky.png').convert()
-ground_surface = pygame.image.load('graphics/ground.png').convert()
-text_surface = test_font.render('My Game', False, 'Black')
+sea_surface = pygame.image.load('assets/sea_bg.png').convert()
+text_surface = font.render('Score: ', False, 'Black')
 
-snail_surface = pygame.image.load('graphics/snail/snail1.png').convert_alpha()
-snail_rect = snail_surface.get_rect(bottomleft = (600,300))
+fort_surface = pygame.image.load('assets/fort.png').convert_alpha()
+fort_rect = fort_surface.get_rect(center = (340,340))
 
-player_surface = pygame.image.load('graphics/player/player_walk_1.png').convert_alpha()
-player_rect = player_surface.get_rect(midbottom = (80,300))
 
 while True:
 
@@ -26,17 +23,10 @@ while True:
             pygame.quit()
             exit()
 
-    screen.blit(sky_surface,(0,0))
-    screen.blit(ground_surface,(0,300))
-    screen.blit(text_surface,(50,50))
-
-    snail_rect.x -= 4
-    if snail_rect.right <= 0: snail_rect.left = 800
-    screen.blit(snail_surface,snail_rect)
-    screen.blit(player_surface,player_rect)
-
-    if player_rect.colliderect(snail_rect):
-        print('collision')
+    screen.blit(sea_surface,(0,0))
+    screen.blit(fort_surface,fort_rect)
+    #if player_rect.colliderect(snail_rect):
+    #    print('collision')
 
     
     #update
