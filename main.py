@@ -201,7 +201,8 @@ def game():
     ship_top_speed = 0
     ship_right_speed = 0
     ship_bot_speed = 0
-
+    
+    
     while True:
 
         #detects if the music is on beat
