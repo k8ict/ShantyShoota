@@ -89,28 +89,33 @@ def shooting(direction):
     global ship_left_spawned, ship_top_spawned, ship_right_spawned, ship_bot_spawned
     global bullet_count, ships_destroyed
     bullet_count -= 1
+
     if direction == 0:
         if ship_left_spawned == True:
             ship_left_rect = ship_left_surface.get_rect(center = (-32,340))
             ship_left_speed = 0
+            ships_destroyed += 1
             snd_explode.play()
             ship_left_spawned = False
     if direction == 1:
         if ship_top_spawned == True:
             ship_top_rect = ship_top_surface.get_rect(center = (340,-32))
             ship_top_speed = 0
+            ships_destroyed += 1
             snd_explode.play()
             ship_top_spawned = False
     if direction == 2:
         if ship_right_spawned == True:
             ship_right_rect = ship_right_surface.get_rect(center = (712,340))
             ship_right_speed = 0
+            ships_destroyed += 1
             snd_explode.play()
             ship_right_spawned = False
     if direction == 3:
         if ship_bot_spawned == True:
             ship_bot_rect = ship_bot_surface.get_rect(center = (340,712))
             ship_bot_speed = 0
+            ships_destroyed += 1
             snd_explode.play()
             ship_bot_spawned = False
 
@@ -168,20 +173,24 @@ def main_menu():
 #gameloop
 def game():
     #ship variables
-    global ship_left_speed, ship_top_speed, ship_right_speed, ship_bot_speed, ship_left_spawned, ship_top_spawned, ship_right_spawned, ship_bot_spawned, ship_left_rect, ship_top_rect, ship_right_rect, ship_bot_rect
+    global ship_left_speed, ship_top_speed, ship_right_speed, ship_bot_speed
+    global ship_left_spawned, ship_top_spawned, ship_right_spawned, ship_bot_spawned
+    global ship_left_rect, ship_top_rect, ship_right_rect, ship_bot_rect
     global fort_rect
+
     #sync variables
     global frame_counter, bullet_count, ships_destroyed, gamestarted_check, onbeat
+
+    #music start
+    pygame.mixer.music.stop()
+    music_loop = pygame.mixer.music.load('music/music_loop.mp3')
+    pygame.mixer.music.play(-1)
 
     fort_rect = fort_surface.get_rect(center = (340,340))
     ship_left_rect = ship_left_surface.get_rect(center = (-32,340))
     ship_top_rect = ship_top_surface.get_rect(center = (340,-32))
     ship_right_rect = ship_right_surface.get_rect(center = (712,340))
     ship_bot_rect = ship_bot_surface.get_rect(center = (340,712))
-
-    pygame.mixer.music.stop()
-    music_loop = pygame.mixer.music.load('music/music_loop.mp3')
-    pygame.mixer.music.play(-1)
 
     #position and speed reset back to default
     ship_left_spawned = False
