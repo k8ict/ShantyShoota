@@ -2,6 +2,7 @@ import pygame
 from sys import exit
 from random import randrange
 import random
+import numpy
 
 #initialize window
 pygame.init()
@@ -18,6 +19,7 @@ menu_bg = pygame.image.load('assets/menu_bg.png').convert()
 bt_start = pygame.image.load('assets/bt_start.png').convert()
 bt_quit = pygame.image.load('assets/bt_quit.png').convert()
 bt_retry = pygame.image.load('assets/bt_retry.png').convert()
+img_bullet = pygame.image.load('assets/bullet.png').convert_alpha()
 
 #fort asset
 fort_surface = pygame.image.load('assets/fort.png').convert_alpha()
@@ -31,6 +33,7 @@ ship_bot_surface = pygame.image.load('assets/ship_bot.png').convert_alpha()
 #sfx
 snd_explode = pygame.mixer.Sound('sfx/explosion.mp3')
 snd_death = pygame.mixer.Sound('sfx/death.mp3')
+snd_miss = pygame.mixer.Sound('sfx/miss.mp3')
 
 #synchronisation data for spawning ships
 frame_counter = 0
@@ -52,6 +55,7 @@ ships_destroyed = 0
 #synchronisation variables
 gamestarted_check = True
 onbeat = False
+wiggle = True
 
 #spawns random ships
 def ship_spawning():
@@ -91,6 +95,8 @@ def shooting(direction):
             ships_destroyed += 1
             snd_explode.play()
             ship_left_spawned = False
+        else:
+            snd_miss.play()
     if direction == 1:
         if ship_top_spawned == True:
             ship_top_rect = ship_top_surface.get_rect(center = (340,-32))
@@ -98,6 +104,8 @@ def shooting(direction):
             ships_destroyed += 1
             snd_explode.play()
             ship_top_spawned = False
+        else:
+            snd_miss.play()            
     if direction == 2:
         if ship_right_spawned == True:
             ship_right_rect = ship_right_surface.get_rect(center = (712,340))
@@ -105,6 +113,8 @@ def shooting(direction):
             ships_destroyed += 1
             snd_explode.play()
             ship_right_spawned = False
+        else:
+            snd_miss.play()            
     if direction == 3:
         if ship_bot_spawned == True:
             ship_bot_rect = ship_bot_surface.get_rect(center = (340,712))
@@ -112,6 +122,8 @@ def shooting(direction):
             ships_destroyed += 1
             snd_explode.play()
             ship_bot_spawned = False
+        else:
+            snd_miss.play()
 
 #collision mechanics
 def collision():
@@ -223,7 +235,7 @@ def game():
     global fort_rect
 
     #sync variables
-    global frame_counter, bullet_count, ships_destroyed, gamestarted_check, onbeat
+    global frame_counter, bullet_count, ships_destroyed, gamestarted_check, onbeat, wiggle
 
     #music start
     pygame.mixer.music.stop()
@@ -232,10 +244,10 @@ def game():
 
     #set initial ship and fort position position
     fort_rect = fort_surface.get_rect(center = (340,340))
-    ship_left_rect = ship_left_surface.get_rect(center = (-32,340))
-    ship_top_rect = ship_top_surface.get_rect(center = (340,-32))
-    ship_right_rect = ship_right_surface.get_rect(center = (712,340))
-    ship_bot_rect = ship_bot_surface.get_rect(center = (340,712))
+    ship_left_rect = ship_left_surface.get_rect(center = (-32,342))
+    ship_top_rect = ship_top_surface.get_rect(center = (338,-32))
+    ship_right_rect = ship_right_surface.get_rect(center = (712,338))
+    ship_bot_rect = ship_bot_surface.get_rect(center = (342,712))
 
     #ship speed reset
     ship_left_spawned = False
@@ -249,7 +261,7 @@ def game():
     
     #set score to 0 every time the game is restarted
     ships_destroyed = 0
-    
+
     while True:
 
         #detects if the music is on beat
@@ -276,13 +288,31 @@ def game():
                     main_menu()
 
         #spawns ships and adds a bullet on beat
-    
         if onbeat == True:
             if bullet_count < 1:
                 bullet_count = 1 
+
             ship_spawning()
+
+            if wiggle == True:
+                ship_left_rect.y += 4
+                ship_top_rect.x += 4
+                ship_right_rect.y -= 4
+                ship_bot_rect.x -= 4
+                wiggle = False
+
+            else:
+                ship_left_rect.y -= 4
+                ship_top_rect.x -= 4
+                ship_right_rect.y += 4
+                ship_bot_rect.x += 4
+                wiggle = True
+
             frame_counter = 0
 
+
+        
+        print(wiggle)
         #background drawing
         screen.blit(sea_surface,(0,0))
         screen.blit(fort_surface,fort_rect)
@@ -302,13 +332,7 @@ def game():
         collision()
 
         #text surfaces for bullets and stats
-        if bullet_count == 1:
-            bullet_txt_surface = font.render('Ready to fire!', False, 'White')
-        else:
-            bullet_txt_surface = font.render('No more ammo', False, 'White')
-        
         ships_txt_surface = font.render('Ships destroyed: ' + str(ships_destroyed), False, 'White')
-        screen.blit(bullet_txt_surface, (20,20))
         screen.blit(ships_txt_surface, (20,60))
 
         onbeat = False
