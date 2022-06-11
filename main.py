@@ -133,12 +133,13 @@ def loss_screen():
     bt_retry_rect = bt_retry.get_rect(midleft = (100,500))
     bt_quit_rect = bt_quit.get_rect(midleft = (380,500))
     score_surface = font.render('Score: '+ str(ships_destroyed), False, 'White')
+    score_rect = score_surface.get_rect(center = (340,300))
 
     while True:
         screen.blit(menu_bg, (0,0))
         screen.blit(bt_retry,bt_retry_rect)
         screen.blit(bt_quit,bt_quit_rect)
-        screen.blit(score_surface, (0,300))
+        screen.blit(score_surface,score_rect)
 
         mx, my = pygame.mouse.get_pos()
 
