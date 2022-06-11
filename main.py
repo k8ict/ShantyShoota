@@ -17,6 +17,7 @@ sea_surface = pygame.image.load('assets/sea_bg.png').convert()
 menu_bg = pygame.image.load('assets/menu_bg.png').convert()
 bt_start = pygame.image.load('assets/bt_start.png').convert()
 bt_quit = pygame.image.load('assets/bt_quit.png').convert()
+bt_retry = pygame.image.load('assets/bt_retry.png').convert()
 
 #fort asset
 fort_surface = pygame.image.load('assets/fort.png').convert_alpha()
@@ -27,14 +28,9 @@ ship_top_surface = pygame.image.load('assets/ship_top.png').convert_alpha()
 ship_right_surface = pygame.image.load('assets/ship_right.png').convert_alpha()
 ship_bot_surface = pygame.image.load('assets/ship_bot.png').convert_alpha()
 
-#ship rects
-
-
-
 #sfx
 snd_explode = pygame.mixer.Sound('sfx/explosion.mp3')
 snd_death = pygame.mixer.Sound('sfx/death.mp3')
-
 
 #synchronisation data for spawning ships
 frame_counter = 0
@@ -122,10 +118,54 @@ def collision():
     if ((ship_left_rect.colliderect(fort_rect) or ship_top_rect.colliderect(fort_rect)) or (ship_right_rect.colliderect(fort_rect) or ship_bot_rect.colliderect(fort_rect))):
         loss_screen()
 
-#lose screen
+#loss screen
 def loss_screen():
-    print('you lose') #TBD
-    main_menu()
+    
+    snd_death.play()
+    
+    #menu click
+    click = False
+
+    #stop music
+    pygame.mixer.music.stop()
+
+    #menu buttons rects
+    bt_retry_rect = bt_retry.get_rect(midleft = (100,500))
+    bt_quit_rect = bt_quit.get_rect(midleft = (380,500))
+    score_surface = font.render('Score: '+ str(ships_destroyed), False, 'White')
+
+    while True:
+        screen.blit(menu_bg, (0,0))
+        screen.blit(bt_retry,bt_retry_rect)
+        screen.blit(bt_quit,bt_quit_rect)
+        screen.blit(score_surface, (0,300))
+
+        mx, my = pygame.mouse.get_pos()
+
+        if bt_retry_rect.collidepoint((mx, my)):
+            if click:
+                click = False
+                game()
+        if bt_quit_rect.collidepoint((mx, my)):
+                if click:
+                    click = False
+                    pygame.quit()
+                    exit()
+
+        #inputs
+        click = False
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    click = True
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE: 
+                    main_menu()
+        pygame.display.update()
+        clock.tick(60)
 
 #main menu
 def main_menu():
