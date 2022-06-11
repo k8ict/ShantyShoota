@@ -53,8 +53,6 @@ ship_bot_spawned = False
 bullet_count = 1
 ships_destroyed = 0
 
-#menu click
-click = False
 #synchronisation variables
 gamestarted_check = True
 onbeat = False
@@ -126,18 +124,23 @@ def collision():
 
 #lose screen
 def loss_screen():
-    print('you lose')
+    print('you lose') #TBD
     main_menu()
 
 #main menu
 def main_menu():
-    global click
+
+    #menu click
+    click = False
+
+    #stop music if returning to menu from game
     pygame.mixer.music.stop()
 
     #menu buttons rects
     bt_start_rect = bt_start.get_rect(midleft = (100,400))
     bt_quit_rect = bt_quit.get_rect(midleft = (380,400))
 
+    #start menu music
     menu_loop = pygame.mixer.music.load('music/music_menu.mp3')
     pygame.mixer.music.play(-1)
 
@@ -186,13 +189,14 @@ def game():
     music_loop = pygame.mixer.music.load('music/music_loop.mp3')
     pygame.mixer.music.play(-1)
 
+    #set initial ship and fort position position
     fort_rect = fort_surface.get_rect(center = (340,340))
     ship_left_rect = ship_left_surface.get_rect(center = (-32,340))
     ship_top_rect = ship_top_surface.get_rect(center = (340,-32))
     ship_right_rect = ship_right_surface.get_rect(center = (712,340))
     ship_bot_rect = ship_bot_surface.get_rect(center = (340,712))
 
-    #position and speed reset back to default
+    #ship speed reset
     ship_left_spawned = False
     ship_top_spawned = False
     ship_right_spawned = False
@@ -202,6 +206,8 @@ def game():
     ship_right_speed = 0
     ship_bot_speed = 0
     
+    #set score to 0 every time the game is restarted
+    ships_destroyed = 0
     
     while True:
 
@@ -264,7 +270,6 @@ def game():
         screen.blit(bullet_txt_surface, (20,20))
         screen.blit(ships_txt_surface, (20,60))
 
-        print(bullet_count)
         onbeat = False
         #update
         pygame.display.update()
