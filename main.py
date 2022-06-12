@@ -310,9 +310,6 @@ def game():
 
             frame_counter = 0
 
-
-        
-        print(wiggle)
         #background drawing
         screen.blit(sea_surface,(0,0))
         screen.blit(fort_surface,fort_rect)
@@ -333,9 +330,10 @@ def game():
 
         #text surfaces for bullets and stats
         ships_txt_surface = font.render('Ships destroyed: ' + str(ships_destroyed), False, 'White')
-        screen.blit(ships_txt_surface, (20,60))
+        screen.blit(ships_txt_surface, (20,20))
 
         onbeat = False
+
         #update
         pygame.display.update()
         clock.tick(60)
