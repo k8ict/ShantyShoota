@@ -16,10 +16,10 @@ sea_surface = pygame.image.load('assets/sea_bg.png').convert()
 
 #menu assets
 menu_bg = pygame.image.load('assets/menu_bg.png').convert()
+loss_bg = pygame.image.load('assets/loss_bg.png').convert()
 bt_start = pygame.image.load('assets/bt_start.png').convert()
 bt_quit = pygame.image.load('assets/bt_quit.png').convert()
 bt_retry = pygame.image.load('assets/bt_retry.png').convert()
-img_bullet = pygame.image.load('assets/bullet.png').convert_alpha()
 
 #fort asset
 fort_surface = pygame.image.load('assets/fort.png').convert_alpha()
@@ -148,7 +148,7 @@ def loss_screen():
     score_rect = score_surface.get_rect(center = (340,300))
 
     while True:
-        screen.blit(menu_bg, (0,0))
+        screen.blit(loss_bg, (0,0))
         screen.blit(bt_retry,bt_retry_rect)
         screen.blit(bt_quit,bt_quit_rect)
         screen.blit(score_surface,score_rect)
