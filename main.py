@@ -12,14 +12,19 @@ pygame.display.set_caption('Shanty Shootah')
 font = pygame.font.Font('font/Pixeltype.ttf', 40)
 
 #ASSETS
-sea_surface = pygame.image.load('assets/sea_bg.png').convert()
-
 #menu assets
 menu_bg = pygame.image.load('assets/menu_bg.png').convert()
 loss_bg = pygame.image.load('assets/loss_bg.png').convert()
 bt_start = pygame.image.load('assets/bt_start.png').convert()
 bt_quit = pygame.image.load('assets/bt_quit.png').convert()
 bt_retry = pygame.image.load('assets/bt_retry.png').convert()
+
+#icon
+game_icon = pygame.image.load('assets/icon.png')
+pygame.display.set_icon(game_icon)
+
+#game background
+sea_surface = pygame.image.load('assets/sea_bg.png').convert()
 
 #fort asset
 fort_surface = pygame.image.load('assets/fort.png').convert_alpha()
@@ -328,7 +333,7 @@ def game():
 
         collision()
 
-        #text surfaces for bullets and stats
+        #text surfaces for stats
         ships_txt_surface = font.render('Ships destroyed: ' + str(ships_destroyed), False, 'White')
         screen.blit(ships_txt_surface, (20,20))
 
